@@ -18,6 +18,13 @@ Drawings are saved automatically and are always waiting in the gallery.
 
 No ads, no accounts and no in-app purchases. No personal data is collected, drawings stay on the device and no internet connection is needed.
 
+## Sürüm notu (1.5.0)
+
+- New calligraphy pen: its flat nib makes lines thicker or thinner depending on their direction.
+- Three new colouring pages: a robot, an astronaut and a dragon.
+- Six line widths instead of three, chosen from a pop-up menu.
+- The tools have a new order, with the paint bucket at the top.
+
 ## Sürüm notu (1.4.0)
 
 - Six new colouring pages: a unicorn, a dog, a castle, a fire engine, a train and a mandala.

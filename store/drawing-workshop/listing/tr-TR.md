@@ -18,6 +18,13 @@ Resimler otomatik olarak kaydedilir ve her zaman galeride sizi bekler.
 
 Reklam, hesap ve uygulama içi satın alma yoktur. Kişisel veri toplanmaz, resimler yalnızca cihazda saklanır ve internet bağlantısı gerekmez.
 
+## Sürüm notu (1.5.0)
+
+- Yeni kaligrafi kalemi: yassı ucu sayesinde çizgi, yönüne göre kalınlaşıp incelir.
+- Üç yeni boyama sayfası: robot, astronot ve ejderha.
+- Çizgi kalınlığı seçenekleri altıya çıktı; kalınlık artık açılır bir menüden seçilir.
+- Araçların sırası yenilendi: boya kovası en üstte.
+
 ## Sürüm notu (1.4.0)
 
 - Altı yeni boyama sayfası: unicorn, köpek, kale, itfaiye aracı, tren ve mandala.
