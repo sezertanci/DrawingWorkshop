@@ -24,6 +24,7 @@ val ToolType.icon: ToolIcon
         ToolType.BRUSH -> ToolIcon.Emoji("🖌️")
         ToolType.SILK -> ToolIcon.Drawable(R.drawable.ic_tool_silk)
         ToolType.MARKER -> ToolIcon.Drawable(R.drawable.ic_tool_marker)
+        ToolType.CALLIGRAPHY -> ToolIcon.Emoji("✒️")
         ToolType.CRAYON -> ToolIcon.Emoji("🖍️")
         ToolType.SPRAY -> ToolIcon.Drawable(R.drawable.ic_tool_spray)
         ToolType.ERASER -> ToolIcon.Drawable(R.drawable.ic_tool_eraser)
@@ -46,6 +47,7 @@ val ToolType.labelRes: Int
         ToolType.BRUSH -> R.string.tool_brush
         ToolType.SILK -> R.string.tool_silk
         ToolType.MARKER -> R.string.tool_marker
+        ToolType.CALLIGRAPHY -> R.string.tool_calligraphy
         ToolType.CRAYON -> R.string.tool_crayon
         ToolType.SPRAY -> R.string.tool_spray
         ToolType.ERASER -> R.string.tool_eraser
@@ -56,15 +58,21 @@ val ToolType.labelRes: Int
 @get:StringRes
 val BrushSize.labelRes: Int
     get() = when (this) {
+        BrushSize.EXTRA_SMALL -> R.string.size_extra_small
         BrushSize.SMALL -> R.string.size_small
+        BrushSize.MEDIUM_SMALL -> R.string.size_medium_small
         BrushSize.MEDIUM -> R.string.size_medium
         BrushSize.LARGE -> R.string.size_large
+        BrushSize.EXTRA_LARGE -> R.string.size_extra_large
     }
 
 /** Boyut düğmesindeki noktanın çapı. */
 val BrushSize.previewDiameter: Dp
     get() = when (this) {
+        BrushSize.EXTRA_SMALL -> 6.dp
         BrushSize.SMALL -> 10.dp
+        BrushSize.MEDIUM_SMALL -> 15.dp
         BrushSize.MEDIUM -> 20.dp
         BrushSize.LARGE -> 34.dp
+        BrushSize.EXTRA_LARGE -> 46.dp
     }

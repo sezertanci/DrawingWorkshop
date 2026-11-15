@@ -7,8 +7,8 @@ sağda renk paneli, ortada tuval bulunur. Tuval dolu olsa bile akıcı çalışm
 
 ### Çizim (1. aşama)
 
-- Kurşun kalem, fırça, keçeli kalem, pastel boya, sprey, silgi ve boya kovası
-- Üç fırça boyutu (ince, orta, kalın)
+- Kurşun kalem, fırça, keçeli kalem, kaligrafi kalemi (yassı eğik uç; yöne göre kalınlaşıp incelir), pastel boya, sprey, silgi ve boya kovası
+- Altı fırça boyutu (çok inceden çok kalına); seçili boyut panelde görünür, diğerleri açılır menüden seçilir
 - 24 renklik palet; seçilen renk kaleme veya tuvalin arka planına uygulanabilir
 - 5 adımlık geri al ve yinele
 - Çizim tuvalin dışına taşmaz; ekran dönse bile çizim kaybolmaz
@@ -22,7 +22,7 @@ sağda renk paneli, ortada tuval bulunur. Tuval dolu olsa bile akıcı çalışm
 
 ### Boyama sayfaları (3. aşama)
 
-- Galerinin üst satırında "Yeni resim" düğmesinin sağında, sola–sağa kaydırılan tek satırda 26 boyama sayfası bulunur (yeni eklenenler başta); kaydedilen resimler bunun altında "Resimlerim" başlığıyla listelenir: kedi, balık, ev, araba, çiçek, kelebek, dinozor, güneş, fayton, baykuş, kaplumbağa, roket, fil, yelkenli, tavşan, peri, midilli, bisikletli kız, prenses, balo elbiseli prenses, unicorn, köpek, kale, itfaiye aracı, tren, mandala
+- Galerinin üst satırında "Yeni resim" düğmesinin sağında, sola–sağa kaydırılan tek satırda 29 boyama sayfası bulunur (yeni eklenenler başta); kaydedilen resimler bunun altında "Resimlerim" başlığıyla listelenir: kedi, balık, ev, araba, çiçek, kelebek, dinozor, güneş, fayton, baykuş, kaplumbağa, roket, fil, yelkenli, tavşan, peri, midilli, bisikletli kız, prenses, balo elbiseli prenses, unicorn, köpek, kale, itfaiye aracı, tren, mandala, robot, astronot, ejderha
 - Sayfaya dokununca o sayfadan yeni bir resim açılır; sayfanın kendisi değişmez
 - Resim ancak boyanınca kaydedilir; açılıp kapatılan sayfa galeride boş resim bırakmaz
 - Çizgiler her zaman en üstte durur: fırça çizgileri örtmez, silgi çizgileri silmez

@@ -19,6 +19,7 @@
     <string name="silk_threads_tulle">Tül</string>
     <string name="silk_threads_dense">Sık ve kalın teller</string>
     <string name="tool_marker">Keçeli kalem</string>
+    <string name="tool_calligraphy">Kaligrafi kalemi</string>
     <string name="tool_crayon">Pastel boya</string>
     <string name="tool_spray">Sprey</string>
     <string name="tool_eraser">Silgi</string>
@@ -26,9 +27,13 @@
     <string name="tool_sticker">Çıkartma</string>
     <string name="sticker_item">Çıkartma seç</string>
 
+    <string name="size_menu">Çizgi kalınlığı</string>
+    <string name="size_extra_small">Çok ince</string>
     <string name="size_small">İnce</string>
+    <string name="size_medium_small">Orta-ince</string>
     <string name="size_medium">Orta</string>
     <string name="size_large">Kalın</string>
+    <string name="size_extra_large">Çok kalın</string>
 
     <string name="symmetry_menu">Simetri</string>
     <string name="symmetry_off">Simetri kapalı</string>

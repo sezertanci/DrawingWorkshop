@@ -6,6 +6,7 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import dev.sezertanci.drawingworkshop.domain.model.StrokeSettings
 import dev.sezertanci.drawingworkshop.domain.model.ToolType
+import dev.sezertanci.drawingworkshop.domain.stroke.CalligraphyNib
 import dev.sezertanci.drawingworkshop.domain.stroke.RainbowHues
 import dev.sezertanci.drawingworkshop.domain.stroke.SilkMotion
 import dev.sezertanci.drawingworkshop.domain.stroke.SprayScatter
@@ -29,6 +30,7 @@ class StrokeFactory @Inject constructor(
         return when (settings.tool) {
             ToolType.SPRAY -> createSpray(settings, width, scale)
             ToolType.ERASER -> createEraser(backgroundColor, width, scale)
+            ToolType.CALLIGRAPHY -> createCalligraphy(settings, width, scale)
             else -> if (settings.rainbow) {
                 createRainbow(width, style.alpha, scale)
             } else {
@@ -84,6 +86,22 @@ class StrokeFactory @Inject constructor(
         return PathStroke(paint, paint, scale.toPx(MIN_POINT_DISTANCE_DP))
     }
 
+    /** Yassı uçlu kalem; uç genişliği fırça boyutundan, en ince çizgi kalınlığı sabit dp'den gelir. */
+    private fun createCalligraphy(settings: StrokeSettings, nibWidth: Float, scale: Scale): ActiveStroke {
+        val paint = strokePaint(settings.color, scale.toPx(CALLIGRAPHY_HAIRLINE_DP), OPAQUE).apply {
+            style = Paint.Style.FILL_AND_STROKE
+        }
+        return CalligraphyStroke(
+            paint,
+            CalligraphyNib(nibWidth, CALLIGRAPHY_NIB_ANGLE),
+            nibWidth,
+            scale.toPx(MIN_POINT_DISTANCE_DP),
+            scale.toPx(CALLIGRAPHY_PIECE_DP),
+            scale.toPx(RAINBOW_SECTION_DP),
+            if (settings.rainbow) rainbowHues(scale) else null,
+        )
+    }
+
     /** Önizlemede arka plan rengiyle boyar, boya katmanında ise pikselleri tamamen siler. */
     private fun createEraser(backgroundColor: Int, width: Float, scale: Scale): ActiveStroke {
         val preview = strokePaint(backgroundColor, width, OPAQUE)
@@ -128,6 +146,15 @@ class StrokeFactory @Inject constructor(
         /** Gökkuşağı çizgisinin tek renk geçişiyle boyanan bölümlerinin uzunluğu. */
         const val RAINBOW_SECTION_DP = 6f
 
+        /** Kaligrafi ucunun yataydan yukarı doğru eğim açısı (derece). */
+        const val CALLIGRAPHY_NIB_ANGLE = 45f
+
+        /** Kaligrafi çizgisinin uca paralel çekildiği en ince yerdeki kalınlığı. */
+        const val CALLIGRAPHY_HAIRLINE_DP = 1f
+
+        /** Kaligrafi çizgisinin bölündüğü düz parçaların en büyük uzunluğu; eğriler köşeli görünmez. */
+        const val CALLIGRAPHY_PIECE_DP = 3f
+
         /** Bu parlaklığın altındaki zeminler koyu sayılır; ipek orada ışık saçarak çizilir. */
         const val DARK_BACKGROUND_LUMINANCE = 0.4f
         const val SILK_SHEET_DP = 0.75f
@@ -137,6 +164,7 @@ class StrokeFactory @Inject constructor(
             ToolType.BRUSH to ToolStyle(widthFactor = 1f),
             ToolType.SILK to ToolStyle(widthFactor = 6f),
             ToolType.MARKER to ToolStyle(widthFactor = 1.3f, alpha = 170),
+            ToolType.CALLIGRAPHY to ToolStyle(widthFactor = 1.4f),
             ToolType.CRAYON to ToolStyle(widthFactor = 1.2f),
             ToolType.SPRAY to ToolStyle(widthFactor = 1.6f),
             ToolType.ERASER to ToolStyle(widthFactor = 1.6f),

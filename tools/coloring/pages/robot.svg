@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1400 1000" width="1400" height="1000"
+     fill="none" stroke="#000" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Atölye duvarındaki dişliler -->
+  <path d="M308,211 L341,214 L341,246 L308,249 L299,278 L323,300 L305,326 L277,309 L251,327 L258,359 L229,369 L215,339 L185,339 L171,369 L142,359 L149,327 L123,309 L95,326 L77,300 L101,278 L92,249 L59,246 L59,214 L92,211 L101,182 L77,160 L95,134 L123,151 L149,133 L142,101 L171,91 L185,121 L215,121 L229,91 L258,101 L251,133 L277,151 L305,134 L323,160 L299,182 Z" fill="#fff"/>
+  <circle cx="200" cy="230" r="45" fill="#fff"/>
+  <circle cx="200" cy="230" r="16" fill="#000" stroke="none"/>
+  <path d="M360,455 L387,456 L387,484 L360,485 L349,508 L365,529 L343,547 L326,526 L301,532 L294,558 L267,552 L272,525 L252,510 L228,520 L216,495 L239,482 L239,458 L216,445 L228,420 L252,430 L272,415 L267,388 L294,382 L301,408 L326,414 L343,393 L365,411 L349,432 Z" fill="#fff"/>
+  <circle cx="300" cy="470" r="18" fill="#000" stroke="none"/>
+
+  <!-- Raf: pil ve somun -->
+  <path d="M1060,600 L1370,600 L1370,640 L1060,640 Z" fill="#fff"/>
+  <path d="M1125,455 L1125,415 L1185,415 L1185,455 Z" fill="#fff"/>
+  <rect x="1100" y="450" width="110" height="150" rx="22" fill="#fff"/>
+  <path d="M1168,478 L1132,532 L1160,532 L1146,578 L1182,518 L1154,518 Z" fill="#000" stroke="none"/>
+  <path d="M1270,600 L1250,565 L1270,530 L1320,530 L1340,565 L1320,600 Z" fill="#fff"/>
+  <circle cx="1295" cy="565" r="14" fill="#000" stroke="none"/>
+
+  <!-- Zemin: karolu atölye tabanı -->
+  <path d="M-20,860 L1420,860 L1420,1020 L-20,1020 Z" fill="#fff"/>
+  <path d="M120,860 L-120,1020 M420,860 L320,1020 M980,860 L1080,1020 M1280,860 L1520,1020"/>
+
+  <!-- Robot -->
+  <path data-tube="50" d="M510,460 L450,570 L440,665"/>
+  <path data-tube="50" d="M890,460 L1000,390 L1050,280"/>
+  <g id="leg">
+    <path d="M575,700 L665,700 L665,820 L575,820 Z" fill="#fff"/>
+    <path d="M540,860 L540,840 C540,795 700,795 700,840 L700,860 Z" fill="#fff"/>
+  </g>
+  <use xlink:href="#leg" transform="matrix(-1,0,0,1,1400,0)"/>
+  <rect x="500" y="390" width="400" height="330" rx="60" fill="#fff"/>
+  <rect x="580" y="440" width="240" height="180" rx="30" fill="#fff"/>
+  <path d="M700,585 C640,545 620,510 640,485 C660,462 690,470 700,495 C710,470 740,462 760,485 C780,510 760,545 700,585 Z" fill="#fff"/>
+  <circle cx="640" cy="670" r="18" fill="#000" stroke="none"/>
+  <circle cx="700" cy="670" r="18" fill="#000" stroke="none"/>
+  <circle cx="760" cy="670" r="18" fill="#000" stroke="none"/>
+  <circle cx="505" cy="455" r="45" fill="#fff"/>
+  <circle cx="895" cy="455" r="45" fill="#fff"/>
+  <path d="M400,690 C400,640 480,640 480,690 C480,740 455,760 440,760 C425,760 400,740 400,690 Z" fill="#fff"/>
+  <circle cx="1058" cy="245" r="48" fill="#fff"/>
+  <path d="M655,345 L745,345 L745,400 L655,400 Z" fill="#fff"/>
+  <path data-tube="42" d="M700,150 L700,100"/>
+  <circle cx="700" cy="78" r="30" fill="#fff"/>
+  <g id="ear">
+    <rect x="495" y="200" width="70" height="100" rx="22" fill="#fff"/>
+  </g>
+  <use xlink:href="#ear" transform="matrix(-1,0,0,1,1400,0)"/>
+  <rect x="540" y="140" width="320" height="220" rx="55" fill="#fff"/>
+  <g id="eye">
+    <circle cx="630" cy="235" r="46" fill="#fff"/>
+    <circle cx="630" cy="240" r="24" fill="#000" stroke="none"/>
+    <circle cx="638" cy="232" r="10" fill="#fff" stroke="none"/>
+  </g>
+  <use xlink:href="#eye" transform="matrix(-1,0,0,1,1400,0)"/>
+  <rect x="615" y="292" width="170" height="44" rx="18" fill="#fff"/>
+  <path stroke-width="9" d="M672,292 L672,336 M728,292 L728,336"/>
+</svg>

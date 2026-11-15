@@ -9,7 +9,7 @@ import org.junit.Test
 class DrawingUiStateTest {
     @Test
     fun drawsRainbow_SupportingTools_ReturnTrue() {
-        for (tool in listOf(ToolType.PENCIL, ToolType.BRUSH, ToolType.MARKER, ToolType.SPRAY)) {
+        for (tool in listOf(ToolType.PENCIL, ToolType.BRUSH, ToolType.MARKER, ToolType.CALLIGRAPHY, ToolType.SPRAY)) {
             assertTrue(tool.name, DrawingUiState(tool = tool, rainbow = true).drawsRainbow)
         }
     }

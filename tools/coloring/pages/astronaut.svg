@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1400 1000" width="1400" height="1000"
+     fill="none" stroke="#000" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Gökyüzü: halkalı gezegen, küçük gezegen ve yıldızlar -->
+  <path data-tube="32" d="M55,215 A175,48 0 0 1 405,215"/>
+  <circle id="planet" cx="230" cy="215" r="92" fill="#fff"/>
+  <path data-clip="planet" stroke-width="10" d="M120,175 C190,150 270,195 340,165 M120,262 C190,240 270,285 340,255"/>
+  <path data-tube="32" d="M55,215 A175,48 0 0 0 405,215"/>
+  <circle cx="230" cy="560" r="62" fill="#fff"/>
+  <circle cx="208" cy="540" r="14" fill="#000" stroke="none"/>
+  <circle cx="252" cy="585" r="10" fill="#000" stroke="none"/>
+  <path d="M470,62 L484,91 L516,95 L493,117 L498,149 L470,134 L442,149 L447,117 L424,95 L456,91 Z" fill="#fff"/>
+  <path d="M1340,50 L1352,74 L1378,78 L1359,96 L1364,122 L1340,110 L1316,122 L1321,96 L1302,78 L1328,74 Z" fill="#fff"/>
+  <path d="M1200,416 L1213,442 L1242,446 L1221,467 L1226,496 L1200,482 L1174,496 L1179,467 L1158,446 L1187,442 Z" fill="#fff"/>
+  <path d="M80,382 L91,405 L116,408 L98,426 L102,451 L80,439 L58,451 L62,426 L44,408 L69,405 Z" fill="#fff"/>
+
+  <!-- Ay yüzeyi ve kraterler -->
+  <path d="M-20,860 C250,815 450,880 700,880 C950,880 1150,825 1420,850 L1420,1020 L-20,1020 Z" fill="#fff"/>
+  <ellipse cx="210" cy="935" rx="85" ry="26" fill="#fff"/>
+  <ellipse cx="1190" cy="940" rx="95" ry="28" fill="#fff"/>
+  <ellipse cx="460" cy="965" rx="50" ry="22" fill="#fff"/>
+
+  <!-- Bayrak -->
+  <path data-tube="30" d="M975,115 L975,900"/>
+  <circle cx="975" cy="105" r="22" fill="#fff"/>
+  <path d="M990,135 C1060,105 1130,165 1260,130 L1260,295 C1130,330 1060,270 990,300 Z" fill="#fff"/>
+  <circle cx="1125" cy="215" r="40" fill="#fff"/>
+
+  <!-- Astronot -->
+  <rect x="520" y="400" width="360" height="300" rx="40" fill="#fff"/>
+  <path data-tube="72" d="M585,480 L505,565 L485,640"/>
+  <path data-tube="72" d="M815,480 L895,440 L945,375"/>
+  <g id="leg">
+    <rect x="580" y="680" width="100" height="160" rx="30" fill="#fff"/>
+    <path d="M550,900 L550,860 C550,808 700,808 700,860 L700,900 Z" fill="#fff"/>
+  </g>
+  <use xlink:href="#leg" transform="matrix(-1,0,0,1,1400,0)"/>
+  <rect x="560" y="420" width="280" height="300" rx="70" fill="#fff"/>
+  <rect x="625" y="510" width="150" height="100" rx="20" fill="#fff"/>
+  <circle cx="660" cy="560" r="16" fill="#000" stroke="none"/>
+  <circle cx="740" cy="560" r="16" fill="#000" stroke="none"/>
+  <circle cx="483" cy="668" r="44" fill="#fff"/>
+  <circle cx="960" cy="355" r="44" fill="#fff"/>
+  <ellipse cx="700" cy="445" rx="130" ry="50" fill="#fff"/>
+  <g id="earpiece">
+    <rect x="505" y="245" width="60" height="90" rx="22" fill="#fff"/>
+  </g>
+  <use xlink:href="#earpiece" transform="matrix(-1,0,0,1,1400,0)"/>
+  <circle cx="700" cy="290" r="160" fill="#fff"/>
+  <ellipse cx="700" cy="300" rx="115" ry="92" fill="#fff"/>
+  <g id="eye">
+    <ellipse cx="655" cy="290" rx="15" ry="21" fill="#000" stroke="none"/>
+  </g>
+  <use xlink:href="#eye" transform="matrix(-1,0,0,1,1400,0)"/>
+  <path stroke-width="10" d="M655,335 C680,360 720,360 745,335"/>
+</svg>

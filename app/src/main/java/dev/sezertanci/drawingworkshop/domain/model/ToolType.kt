@@ -1,15 +1,16 @@
 package dev.sezertanci.drawingworkshop.domain.model
 
-/** Araç panelinde seçilebilen çizim araçları. */
+/** Araç panelinde seçilebilen çizim araçları; sıra, paneldeki görünüş sırasıdır. */
 enum class ToolType {
+    BUCKET,
     PENCIL,
     BRUSH,
-    SILK,
     MARKER,
+    CALLIGRAPHY,
     CRAYON,
     SPRAY,
+    SILK,
     ERASER,
-    BUCKET,
     STICKER,
     ;
 
@@ -19,5 +20,6 @@ enum class ToolType {
 
     /** Gökkuşağı rengiyle çizebilen araçlar; diğerleri son seçilen düz rengi kullanır. */
     val supportsRainbow: Boolean
-        get() = this == PENCIL || this == BRUSH || this == MARKER || this == SPRAY
+        get() = this == PENCIL || this == BRUSH || this == MARKER ||
+            this == CALLIGRAPHY || this == SPRAY
 }

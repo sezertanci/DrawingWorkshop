@@ -1,12 +1,7 @@
 package dev.sezertanci.drawingworkshop.ui.drawing.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,18 +20,13 @@ import dev.sezertanci.drawingworkshop.ui.components.ConfirmDialog
 import dev.sezertanci.drawingworkshop.ui.components.EmojiIcon
 import dev.sezertanci.drawingworkshop.ui.components.PanelButton
 import dev.sezertanci.drawingworkshop.ui.drawing.ExportStatus
-import dev.sezertanci.drawingworkshop.ui.theme.WorkshopColors
 
 private val PanelWidth = 88.dp
 private val PanelDividerWidth = 56.dp
 private val PanelDividerThickness = 2.dp
 
-/** Boyut noktasının ince kenarı; beyaz gibi zeminle aynı renkler de görünür kalır. */
-private val SizeDotOutline = 1.dp
-
-/** Boyut düğmeleri, onları kullanan çizim araçlarının hemen altında; kova ve çıkartma ayrı grupta durur. */
-private val SizedTools = ToolType.entries.filter { it.usesBrushSize }
-private val UnsizedTools = ToolType.entries.filterNot { it.usesBrushSize }
+/** Boyut düğmesi, çizim araçlarının hemen altında; kova en üstte, çıkartma ayrı grupta durur. */
+private val DrawingTools = ToolType.entries.filter { it != ToolType.STICKER }
 
 /** Panelin araç dışındaki düğmeleri: galeriye dönme, geri al / yinele, temizleme ve galeriye aktarma. */
 class ToolPanelActions(
@@ -50,7 +40,7 @@ class ToolPanelActions(
     val onExport: () -> Unit,
 )
 
-/** Soldaki kaydırılabilir araç paneli: galeri, çizim araçları (ipek stilleriyle), fırça boyutları, kova ve çıkartma, simetri, geri al, yinele, temizle ve aktarma. */
+/** Soldaki kaydırılabilir araç paneli: galeri, çizim araçları (ipek stilleriyle), fırça boyutu menüsü, kova ve çıkartma, simetri, geri al, yinele, temizle ve aktarma. */
 @Composable
 fun ToolPanel(
     selectedTool: ToolType,
@@ -70,7 +60,7 @@ fun ToolPanel(
     PanelColumn(width = PanelWidth, modifier = modifier) {
         item { ActionButton(HOME_EMOJI, R.string.action_home, onClick = actions.onHome) }
         item { PanelDivider() }
-        items(SizedTools) { tool ->
+        items(DrawingTools) { tool ->
             val selected = tool == selectedTool
             if (tool == ToolType.SILK) {
                 SilkToolButton(selected, silk) { onToolSelected(tool) }
@@ -79,22 +69,12 @@ fun ToolPanel(
             }
         }
         item { PanelDivider() }
-        items(BrushSize.entries) { size ->
-            PanelButton(
-                selected = size == selectedSize,
-                description = stringResource(size.labelRes),
-                onClick = { onSizeSelected(size) },
-            ) {
-                Box(
-                    Modifier
-                        .size(size.previewDiameter)
-                        .background(dotBrush, CircleShape)
-                        .border(SizeDotOutline, WorkshopColors.Outline, CircleShape),
-                )
-            }
-        }
+        item { SizeMenuButton(selectedSize, dotBrush, onSizeSelected) }
         item { PanelDivider() }
-        items(UnsizedTools) { tool -> ToolButton(tool, tool == selectedTool) { onToolSelected(tool) } }
+        item {
+            val sticker = ToolType.STICKER
+            ToolButton(sticker, sticker == selectedTool) { onToolSelected(sticker) }
+        }
         item { PanelDivider() }
         symmetryItems(symmetry)
         item { PanelDivider() }

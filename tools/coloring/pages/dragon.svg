@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1400 1000" width="1400" height="1000"
+     fill="none" stroke="#000" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Uzaktaki dağlar -->
+  <path d="M900,700 C980,520 1060,400 1150,420 C1200,350 1300,330 1420,400 L1420,860 L900,860 Z" fill="#fff"/>
+  <path d="M1080,520 C1120,500 1150,470 1150,420" stroke-width="9"/>
+
+  <!-- Mağara -->
+  <path id="rock" d="M-20,1020 L-20,140 C100,80 270,110 340,210 C410,310 450,520 470,1020 Z" fill="#fff"/>
+  <path data-clip="rock" stroke-width="9" d="M40,240 C90,230 120,260 150,250 M300,240 C320,280 350,300 390,300 M380,560 C410,580 430,620 470,620"/>
+  <path d="M60,900 L60,640 C60,450 140,340 215,340 C300,340 365,450 365,640 L365,900 Z" fill="#fff"/>
+
+  <!-- Zemin -->
+  <path d="M-20,850 C300,875 600,835 900,855 C1100,868 1300,840 1420,852 L1420,1020 L-20,1020 Z" fill="#fff"/>
+  <ellipse cx="150" cy="940" rx="70" ry="25" fill="#fff"/>
+  <ellipse cx="1240" cy="960" rx="80" ry="26" fill="#fff"/>
+
+  <!-- Hazine yığını -->
+  <path d="M1060,875 C1090,720 1310,710 1370,875 Z" fill="#fff"/>
+  <circle cx="1150" cy="830" r="34" fill="#fff"/>
+  <circle cx="1230" cy="790" r="34" fill="#fff"/>
+  <circle cx="1268" cy="835" r="34" fill="#fff"/>
+  <path d="M1190,700 L1230,660 L1270,700 L1230,760 Z" fill="#fff"/>
+
+  <!-- Ejderha -->
+  <path data-tube="60" d="M820,810 C930,860 1010,830 1015,760"/>
+  <path d="M1015,700 C990,660 950,690 975,725 L1015,770 L1055,725 C1080,690 1040,660 1015,700 Z" fill="#fff"/>
+  <g id="wing">
+    <path d="M615,660 C565,575 480,490 380,450 C405,505 395,555 410,605 C440,595 470,612 475,650 C505,642 530,665 545,700 Z" fill="#fff"/>
+  </g>
+  <use xlink:href="#wing" transform="matrix(-1,0,0,1,1400,0)"/>
+  <path d="M560,870 C515,760 535,560 700,545 C865,560 885,760 840,870 Z" fill="#fff"/>
+  <ellipse id="belly" cx="700" cy="735" rx="95" ry="105" fill="#fff"/>
+  <path data-clip="belly" stroke-width="9" d="M590,695 L810,695 M590,750 L810,750 M590,805 L810,805"/>
+  <g id="side">
+    <path data-tube="44" d="M600,630 C575,665 590,705 630,705"/>
+    <ellipse cx="600" cy="868" rx="68" ry="38" fill="#fff"/>
+    <ellipse cx="562" cy="872" rx="9" ry="13" fill="#000" stroke="none"/>
+    <ellipse cx="592" cy="880" rx="9" ry="13" fill="#000" stroke="none"/>
+    <path d="M610,360 C585,300 570,260 545,225 C605,235 650,285 662,340 Z" fill="#fff"/>
+  </g>
+  <use xlink:href="#side" transform="matrix(-1,0,0,1,1400,0)"/>
+  <ellipse cx="700" cy="450" rx="150" ry="125" fill="#fff"/>
+  <g id="eye">
+    <ellipse cx="640" cy="425" rx="25" ry="33" fill="#000" stroke="none"/>
+    <circle cx="648" cy="412" r="10" fill="#fff" stroke="none"/>
+  </g>
+  <use xlink:href="#eye" transform="matrix(-1,0,0,1,1400,0)"/>
+  <ellipse cx="700" cy="540" rx="95" ry="55" fill="#fff"/>
+  <ellipse cx="670" cy="525" rx="10" ry="14" fill="#000" stroke="none"/>
+  <ellipse cx="730" cy="525" rx="10" ry="14" fill="#000" stroke="none"/>
+  <path stroke-width="10" d="M650,560 C680,580 720,580 750,560"/>
+</svg>
