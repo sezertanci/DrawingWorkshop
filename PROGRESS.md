@@ -179,6 +179,11 @@ Tarih: 2026-11-08 (3. aşama tamamlandı)
      - Gizlilik politikası `store/drawing-workshop/privacy.html` (Türkçe + İngilizce). Hedef adres:
        `https://sezertanci.github.io/drawing-workshop/privacy.html` (kullanıcı `sezertanci.github.io` adlı public
        repoyu web arayüzünden açıp dosyayı koyacak).
+   - **Renk özellikleri (commit edildi, emülatörde denendi):** geniş renk paneli (🎨, HSV seçici ve
+     tonlar), desenli kova (`FillPattern`, desen imzası `PatternMark`), sim tozu (gökkuşağı dahil) ve renk
+     damlalığı. Damlalık panelden açılır; tuvalde basılı tutarken parmağın üstünde büyüteç görünür,
+     bırakınca renk seçilir ve panel yeniden açılır (`EyedropperLoupe`, `DrawingEngine.takeProbe`).
+     Alfa karışımı ortak `Argb.sourceOver`. 158 birim testi geçiyor.
    - **Sıradaki adım:** kullanıcı `keytool` ile yükleme anahtarını oluşturur ve şifreleri
      `~/.gradle/gradle.properties` dosyasına yazar; ardından imzalı `bundleRelease`. Sonra Play Console:
      ekran görüntüleri (emülatör), mağaza metinleri, Aileler politikası beyanları, 12 kişiyle 14 gün kapalı test.

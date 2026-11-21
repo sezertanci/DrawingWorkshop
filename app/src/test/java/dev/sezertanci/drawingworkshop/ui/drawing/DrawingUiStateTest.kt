@@ -44,6 +44,24 @@ class DrawingUiStateTest {
         assertEquals(RED, state.selectedColor)
     }
 
+    @Test
+    fun withColor_StrokeTarget_SetsStrokeColorAndDropsRainbow() {
+        val state = DrawingUiState(rainbow = true).withColor(RED)
+
+        assertEquals(RED, state.strokeColor)
+        assertFalse(state.rainbow)
+    }
+
+    @Test
+    fun withColor_BackgroundTarget_SetsBackgroundColorOnly() {
+        val before = DrawingUiState(colorTarget = ColorTarget.BACKGROUND, rainbow = true)
+        val state = before.withColor(RED)
+
+        assertEquals(RED, state.backgroundColor)
+        assertEquals(before.strokeColor, state.strokeColor)
+        assertTrue(state.rainbow)
+    }
+
     private companion object {
         const val RED = 0xFFFF0000.toInt()
     }

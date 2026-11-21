@@ -134,6 +134,9 @@ class DrawingSurface {
         return pixels
     }
 
+    /** Tek pikselin rengi; nokta tuvalin dışındaysa `null` döner. */
+    fun pixelAt(x: Int, y: Int): Int? = bitmap?.takeIf { x in 0 until it.width && y in 0 until it.height }?.getPixel(x, y)
+
     fun writePixels(pixels: IntArray, bounds: PixelRect) {
         val target = bitmap ?: return
         val offset = bounds.top * target.width + bounds.left

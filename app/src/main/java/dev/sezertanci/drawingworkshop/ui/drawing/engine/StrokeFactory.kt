@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
+import androidx.core.graphics.ColorUtils
 import dev.sezertanci.drawingworkshop.domain.model.StrokeSettings
 import dev.sezertanci.drawingworkshop.domain.model.ToolType
 import dev.sezertanci.drawingworkshop.domain.stroke.CalligraphyNib
@@ -31,8 +32,9 @@ class StrokeFactory @Inject constructor(
             ToolType.SPRAY -> createSpray(settings, width, scale)
             ToolType.ERASER -> createEraser(backgroundColor, width, scale)
             ToolType.CALLIGRAPHY -> createCalligraphy(settings, width, scale)
+            ToolType.GLITTER -> createGlitter(settings, width, scale)
             else -> if (settings.rainbow) {
-                createRainbow(width, style.alpha, scale)
+                createRainbow(width, style.alpha, scale, rainbowHues(scale))
             } else {
                 createPath(settings, width, style.alpha, scale)
             }
@@ -65,8 +67,7 @@ class StrokeFactory @Inject constructor(
         }
 
     /** Renk çizgi boyunca kendiliğinden ve rastgele değişir; aracın saydamlığı bütün çizgiye birden uygulanır. */
-    private fun createRainbow(width: Float, alpha: Int, scale: Scale): ActiveStroke {
-        val hues = rainbowHues(scale)
+    private fun createRainbow(width: Float, alpha: Int, scale: Scale, hues: RainbowHues): ActiveStroke {
         val paint = strokePaint(hues.colorAt(0f), width, OPAQUE)
         val layerAlpha = alpha.takeIf { it < OPAQUE }
         return RainbowStroke(
@@ -102,6 +103,29 @@ class StrokeFactory @Inject constructor(
         )
     }
 
+    /**
+     * Sim tozu: seçili renkte (veya gökkuşağı renklerinde) bir çizginin üzerine beyaz ve rengin açık
+     * tonunda parıltı taneleri serpilir, aralarına küçük beyaz yıldız ışıltıları konur. Gökkuşağında
+     * çizgi ve açık tonlu taneler aynı renk akışını izler.
+     */
+    private fun createGlitter(settings: StrokeSettings, width: Float, scale: Scale): ActiveStroke {
+        val hues = if (settings.rainbow) rainbowHues(scale) else null
+        val line = hues?.let { createRainbow(width, OPAQUE, scale, it) } ?: createPath(settings, width, OPAQUE, scale)
+        val baseColor: (Float) -> Int = hues?.let { it::colorAt } ?: { settings.color }
+        val radius = width / 2f
+        val grainWidth = scale.toPx(GLITTER_GRAIN_DP)
+        val tintGrains = SprayStroke(
+            strokePaint(settings.color, grainWidth, OPAQUE),
+            radius,
+            GLITTER_GRAINS_PER_TOUCH,
+            sprayScatter,
+        ) { ColorUtils.blendARGB(baseColor(it), Color.WHITE, GLITTER_TINT_SHARE) }
+        val whiteGrains = SprayStroke(strokePaint(Color.WHITE, grainWidth, OPAQUE), radius, GLITTER_GRAINS_PER_TOUCH, sprayScatter)
+        val starPaint = strokePaint(Color.WHITE, 0f, OPAQUE).apply { style = Paint.Style.FILL }
+        val stars = SparkleStars(starPaint, radius, scale.toPx(GLITTER_STAR_SPACING_DP), scale.toPx(GLITTER_STAR_DP), sprayScatter)
+        return LayeredStroke(listOf(line, tintGrains, whiteGrains, stars))
+    }
+
     /** Önizlemede arka plan rengiyle boyar, boya katmanında ise pikselleri tamamen siler. */
     private fun createEraser(backgroundColor: Int, width: Float, scale: Scale): ActiveStroke {
         val preview = strokePaint(backgroundColor, width, OPAQUE)
@@ -114,7 +138,7 @@ class StrokeFactory @Inject constructor(
     private fun createSpray(settings: StrokeSettings, radius: Float, scale: Scale): ActiveStroke {
         val dotPaint = strokePaint(settings.color, scale.toPx(SPRAY_DOT_DP), OPAQUE)
         val hues = if (settings.rainbow) rainbowHues(scale) else null
-        return SprayStroke(dotPaint, radius, SPRAY_DOTS_PER_TOUCH, sprayScatter, hues)
+        return SprayStroke(dotPaint, radius, SPRAY_DOTS_PER_TOUCH, sprayScatter, hues?.let { it::colorAt })
     }
 
     private fun strokePaint(color: Int, width: Float, alpha: Int) = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -139,6 +163,17 @@ class StrokeFactory @Inject constructor(
         const val MIN_POINT_DISTANCE_DP = 1f
         const val SPRAY_DOT_DP = 1.5f
         const val SPRAY_DOTS_PER_TOUCH = 14
+
+        /** Sim tozu parıltı tanelerinin çapı ve her dokunuşta serpilen beyaz ve açık tonlu tane sayısı. */
+        const val GLITTER_GRAIN_DP = 2f
+        const val GLITTER_GRAINS_PER_TOUCH = 3
+
+        /** Taneler, çizgi renginin bu oranda beyazla karışmış açık tonudur. */
+        const val GLITTER_TINT_SHARE = 0.6f
+
+        /** Sim tozu yıldızlarının aralığı ve büyük yıldızın merkezden ucuna uzunluğu. */
+        const val GLITTER_STAR_SPACING_DP = 28f
+        const val GLITTER_STAR_DP = 5f
 
         /** Gökkuşağı renginin bir hedef renkten sonrakine geçerken aldığı yol. */
         const val RAINBOW_LEG_DP = 400f
@@ -167,6 +202,7 @@ class StrokeFactory @Inject constructor(
             ToolType.CALLIGRAPHY to ToolStyle(widthFactor = 1.4f),
             ToolType.CRAYON to ToolStyle(widthFactor = 1.2f),
             ToolType.SPRAY to ToolStyle(widthFactor = 1.6f),
+            ToolType.GLITTER to ToolStyle(widthFactor = 1.2f),
             ToolType.ERASER to ToolStyle(widthFactor = 1.6f),
         )
     }

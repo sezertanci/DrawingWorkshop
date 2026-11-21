@@ -13,13 +13,15 @@ import dev.sezertanci.drawingworkshop.domain.model.Palette
 import dev.sezertanci.drawingworkshop.ui.components.EmojiIcon
 import dev.sezertanci.drawingworkshop.ui.components.PanelButton
 import dev.sezertanci.drawingworkshop.ui.drawing.ColorTarget
+import dev.sezertanci.drawingworkshop.ui.theme.WorkshopColors
 
 private val SwatchSize = 52.dp
 
 /**
  * Sağdaki kaydırılabilir renk paneli. Üstteki iki düğme, seçilen rengin kaleme mi yoksa tuvalin
  * arka planına mı uygulanacağını belirler. Listenin başındaki gökkuşağı, onu destekleyen araçlarla
- * kalemde seçilebilir; seçilemediği yerde soluk görünür.
+ * kalemde seçilebilir; seçilemediği yerde soluk görünür. Renklerin başındaki düğme geniş renk panelini
+ * açar; oradan seçilen, listede olmayan bir renk bu düğmenin içinde görünür.
  */
 @Composable
 fun ColorPanel(
@@ -28,8 +30,10 @@ fun ColorPanel(
     rainbow: RainbowChoice,
     onColorTargetSelected: (ColorTarget) -> Unit,
     onColorSelected: (Int) -> Unit,
+    onMoreColors: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val customSelected = !rainbow.selected && selectedColor !in Palette.colors
     PanelColumn(width = RightPanelWidth, modifier = modifier) {
         item {
             PanelButton(
@@ -46,6 +50,16 @@ fun ColorPanel(
             ) { EmojiIcon(BACKGROUND_TARGET_EMOJI) }
         }
         item { PanelDivider() }
+        item {
+            PanelButton(
+                selected = customSelected,
+                description = stringResource(R.string.color_more),
+                onClick = onMoreColors,
+                size = SwatchSize,
+                shape = CircleShape,
+                background = SolidColor(if (customSelected) Color(selectedColor) else WorkshopColors.ItemBackground),
+            ) { if (!customSelected) EmojiIcon(MORE_COLORS_EMOJI) }
+        }
         item {
             PanelButton(
                 selected = rainbow.selected,
@@ -79,3 +93,4 @@ class RainbowChoice(
 
 private const val STROKE_TARGET_EMOJI = "🖌️"
 private const val BACKGROUND_TARGET_EMOJI = "🖼️"
+private const val MORE_COLORS_EMOJI = "🎨"

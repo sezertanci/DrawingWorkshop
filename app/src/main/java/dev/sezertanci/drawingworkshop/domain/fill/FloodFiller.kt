@@ -9,6 +9,7 @@ interface FloodFiller {
      * pikseller duvar sayılır: dolgu bunları boyamaz ve öteye geçmez (boyama sayfasının çizgileri).
      * [boundary] verilirse kenarı da duvar gibi davranır: dolgu, başladığı noktanın bulunduğu tarafta
      * (içinde ya da dışında) kalır. Böylece kenara açılan bölgeler çizimin dışına taşmaz.
+     * Her piksel [paint] boyasının o pikseldeki rengine boyanır (düz renk veya desen).
      */
     fun fill(
         pixels: IntArray,
@@ -16,7 +17,7 @@ interface FloodFiller {
         height: Int,
         startX: Int,
         startY: Int,
-        color: Int,
+        paint: FillPaint,
         walls: BooleanArray? = null,
         boundary: PixelRect? = null,
     ): PixelRect?

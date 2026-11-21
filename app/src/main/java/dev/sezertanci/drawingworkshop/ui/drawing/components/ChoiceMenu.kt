@@ -2,6 +2,7 @@ package dev.sezertanci.drawingworkshop.ui.drawing.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.runtime.Composable
@@ -41,6 +42,32 @@ internal fun <T> ChoiceColumn(
                 onClick = { onSelected(option) },
                 modifier = Modifier.padding(MenuItemPadding),
             ) { icon(option) }
+        }
+    }
+}
+
+/**
+ * Seçenekleri, alt alta sığmadıklarında [columns] sütuna dizer; satırlar soldan sağa ilerler: iki sütunda
+ * soldaki sütunda 1., 3., 5. seçenek, sağdakinde 2., 4., 6. seçenek durur.
+ */
+@Composable
+internal fun <T> ChoiceGrid(
+    options: List<T>,
+    columns: Int,
+    selected: T,
+    labelOf: (T) -> Int,
+    onSelected: (T) -> Unit,
+    icon: @Composable (T) -> Unit,
+) {
+    Row {
+        repeat(columns) { column ->
+            ChoiceColumn(
+                options = options.filterIndexed { index, _ -> index % columns == column },
+                selected = selected,
+                labelOf = labelOf,
+                onSelected = onSelected,
+                icon = icon,
+            )
         }
     }
 }

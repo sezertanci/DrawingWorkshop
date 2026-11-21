@@ -4,7 +4,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import dev.sezertanci.drawingworkshop.domain.stroke.FloatList
-import dev.sezertanci.drawingworkshop.domain.stroke.RainbowHues
 import dev.sezertanci.drawingworkshop.domain.stroke.SprayScatter
 import dev.sezertanci.drawingworkshop.domain.stroke.StrokePoint
 import kotlin.math.ceil
@@ -13,15 +12,15 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * Parmağın geçtiği yere rastgele küçük noktalar serpen sprey çizgisi. [hues] verilmişse noktaların rengi
- * parmağın aldığı yola göre gökkuşağı renkleri arasında değişir; aynı renkteki ardışık noktalar bir arada çizilir.
+ * Parmağın geçtiği yere rastgele küçük noktalar serpen sprey çizgisi. [colorAt] verilmişse noktaların rengi
+ * parmağın aldığı yola göre değişir (ör. gökkuşağı renkleri); aynı renkteki ardışık noktalar bir arada çizilir.
  */
 class SprayStroke(
     private val paint: Paint,
     private val radius: Float,
     private val dotsPerTouch: Int,
     private val scatter: SprayScatter,
-    private val hues: RainbowHues? = null,
+    private val colorAt: ((distance: Float) -> Int)? = null,
 ) : ActiveStroke {
     private val dots = FloatList()
     private val runs = ArrayList<ColorRun>()
@@ -61,7 +60,7 @@ class SprayStroke(
         distance += hypot(x - lastX, y - lastY)
         lastX = x
         lastY = y
-        val color = hues?.colorAt(distance) ?: paint.color
+        val color = colorAt?.invoke(distance) ?: paint.color
         if (runs.lastOrNull()?.color != color) runs.add(ColorRun(dots.size, color))
         scatter.scatter(StrokePoint(x, y), radius, dotsPerTouch, dots)
         minX = min(minX, x)

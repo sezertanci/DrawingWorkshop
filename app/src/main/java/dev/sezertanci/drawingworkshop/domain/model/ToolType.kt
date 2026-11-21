@@ -9,6 +9,7 @@ enum class ToolType {
     CALLIGRAPHY,
     CRAYON,
     SPRAY,
+    GLITTER,
     SILK,
     ERASER,
     STICKER,
@@ -21,5 +22,5 @@ enum class ToolType {
     /** Gökkuşağı rengiyle çizebilen araçlar; diğerleri son seçilen düz rengi kullanır. */
     val supportsRainbow: Boolean
         get() = this == PENCIL || this == BRUSH || this == MARKER ||
-            this == CALLIGRAPHY || this == SPRAY
+            this == CALLIGRAPHY || this == SPRAY || this == GLITTER
 }

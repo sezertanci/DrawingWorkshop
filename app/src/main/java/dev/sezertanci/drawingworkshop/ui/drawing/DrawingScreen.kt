@@ -1,6 +1,8 @@
 package dev.sezertanci.drawingworkshop.ui.drawing
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -18,8 +20,10 @@ import dev.sezertanci.drawingworkshop.domain.model.ToolType
 import dev.sezertanci.drawingworkshop.domain.symmetry.SymmetryMode
 import dev.sezertanci.drawingworkshop.ui.components.screenContainer
 import dev.sezertanci.drawingworkshop.ui.drawing.components.ColorPanel
+import dev.sezertanci.drawingworkshop.ui.drawing.components.ColorPickerPanel
 import dev.sezertanci.drawingworkshop.ui.drawing.components.RainbowChoice
 import dev.sezertanci.drawingworkshop.ui.drawing.components.StickerPanel
+import dev.sezertanci.drawingworkshop.ui.drawing.components.FillPatternControls
 import dev.sezertanci.drawingworkshop.ui.drawing.components.SilkStyleControls
 import dev.sezertanci.drawingworkshop.ui.drawing.components.SymmetryControls
 import dev.sezertanci.drawingworkshop.ui.drawing.components.ToolPanel
@@ -59,16 +63,32 @@ fun DrawingRoute(onHome: () -> Unit, viewModel: DrawingViewModel = hiltViewModel
             onSymmetricFillSelected = viewModel::selectSymmetricFill,
         ),
         silk = SilkStyleControls(style = state.silkStyle, onStyleSelected = viewModel::selectSilkStyle),
+        fill = FillPatternControls(pattern = state.fillPattern, onPatternSelected = viewModel::selectFillPattern),
         onToolSelected = viewModel::selectTool,
         onSizeSelected = viewModel::selectBrushSize,
         onColorTargetSelected = viewModel::selectColorTarget,
         onColorSelected = viewModel::selectColor,
         onRainbowSelected = viewModel::selectRainbow,
         onStickerSelected = viewModel::selectSticker,
+        picker = ColorPickerActions(
+            onOpen = viewModel::openColorPicker,
+            onClose = viewModel::closeColorPicker,
+            onEyedropper = viewModel::startEyedropper,
+        ),
     )
 }
 
-/** Yatay yerleşim: solda araç paneli, ortada tuval, sağda renk paneli (çıkartma aracında çıkartma paneli). */
+/** Geniş renk panelini açan, kapatan ve damlalığı başlatan işlemler. */
+class ColorPickerActions(
+    val onOpen: () -> Unit,
+    val onClose: () -> Unit,
+    val onEyedropper: () -> Unit,
+)
+
+/**
+ * Yatay yerleşim: solda araç paneli, ortada tuval, sağda renk paneli (çıkartma aracında çıkartma paneli).
+ * Geniş renk paneli, açıldığında sağdan tuvalin üstüne kayar.
+ */
 @Composable
 fun DrawingScreen(
     state: DrawingUiState,
@@ -76,43 +96,54 @@ fun DrawingScreen(
     actions: ToolPanelActions,
     symmetry: SymmetryControls,
     silk: SilkStyleControls,
+    fill: FillPatternControls,
     onToolSelected: (ToolType) -> Unit,
     onSizeSelected: (BrushSize) -> Unit,
     onColorTargetSelected: (ColorTarget) -> Unit,
     onColorSelected: (Int) -> Unit,
     onRainbowSelected: () -> Unit,
     onStickerSelected: (String) -> Unit,
+    picker: ColorPickerActions,
 ) {
-    Row(
-        modifier = Modifier.screenContainer(),
-    ) {
-        ToolPanel(
-            selectedTool = state.tool,
-            selectedSize = state.brushSize,
-            strokeColor = Color(state.strokeColor),
-            drawsRainbow = state.drawsRainbow,
-            actions = actions,
-            symmetry = symmetry,
-            silk = silk,
-            onToolSelected = onToolSelected,
-            onSizeSelected = onSizeSelected,
-        )
-        canvas(
-            Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .padding(vertical = CanvasPadding),
-        )
-        if (state.tool == ToolType.STICKER) {
-            StickerPanel(selectedSticker = state.sticker, onStickerSelected = onStickerSelected)
-        } else {
-            ColorPanel(
-                colorTarget = state.colorTarget,
-                selectedColor = state.selectedColor,
-                rainbow = RainbowChoice(state.isRainbowSelected, state.isRainbowAvailable, onRainbowSelected),
-                onColorTargetSelected = onColorTargetSelected,
-                onColorSelected = onColorSelected,
+    Box(Modifier.screenContainer()) {
+        Row(Modifier.fillMaxSize()) {
+            ToolPanel(
+                selectedTool = state.tool,
+                selectedSize = state.brushSize,
+                strokeColor = Color(state.strokeColor),
+                drawsRainbow = state.drawsRainbow,
+                actions = actions,
+                symmetry = symmetry,
+                silk = silk,
+                fill = fill,
+                onToolSelected = onToolSelected,
+                onSizeSelected = onSizeSelected,
             )
+            canvas(
+                Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(vertical = CanvasPadding),
+            )
+            if (state.tool == ToolType.STICKER) {
+                StickerPanel(selectedSticker = state.sticker, onStickerSelected = onStickerSelected)
+            } else {
+                ColorPanel(
+                    colorTarget = state.colorTarget,
+                    selectedColor = state.selectedColor,
+                    rainbow = RainbowChoice(state.isRainbowSelected, state.isRainbowAvailable, onRainbowSelected),
+                    onColorTargetSelected = onColorTargetSelected,
+                    onColorSelected = onColorSelected,
+                    onMoreColors = picker.onOpen,
+                )
+            }
         }
+        ColorPickerPanel(
+            visible = state.colorPicker == ColorPickerMode.PANEL,
+            selectedColor = state.selectedColor.takeUnless { state.isRainbowSelected },
+            onColorSelected = onColorSelected,
+            onEyedropper = picker.onEyedropper,
+            onDismiss = picker.onClose,
+        )
     }
 }

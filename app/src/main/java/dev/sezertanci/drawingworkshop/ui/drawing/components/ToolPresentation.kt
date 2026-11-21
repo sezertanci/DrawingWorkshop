@@ -27,6 +27,7 @@ val ToolType.icon: ToolIcon
         ToolType.CALLIGRAPHY -> ToolIcon.Emoji("✒️")
         ToolType.CRAYON -> ToolIcon.Emoji("🖍️")
         ToolType.SPRAY -> ToolIcon.Drawable(R.drawable.ic_tool_spray)
+        ToolType.GLITTER -> ToolIcon.Emoji("✨")
         ToolType.ERASER -> ToolIcon.Drawable(R.drawable.ic_tool_eraser)
         ToolType.BUCKET -> ToolIcon.Drawable(R.drawable.ic_tool_bucket)
         ToolType.STICKER -> ToolIcon.Emoji("🐱")
@@ -50,6 +51,7 @@ val ToolType.labelRes: Int
         ToolType.CALLIGRAPHY -> R.string.tool_calligraphy
         ToolType.CRAYON -> R.string.tool_crayon
         ToolType.SPRAY -> R.string.tool_spray
+        ToolType.GLITTER -> R.string.tool_glitter
         ToolType.ERASER -> R.string.tool_eraser
         ToolType.BUCKET -> R.string.tool_bucket
         ToolType.STICKER -> R.string.tool_sticker

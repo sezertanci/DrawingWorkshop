@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.sezertanci.drawingworkshop.R
@@ -40,7 +41,7 @@ class ToolPanelActions(
     val onExport: () -> Unit,
 )
 
-/** Soldaki kaydırılabilir araç paneli: galeri, çizim araçları (ipek stilleriyle), fırça boyutu menüsü, kova ve çıkartma, simetri, geri al, yinele, temizle ve aktarma. */
+/** Soldaki kaydırılabilir araç paneli: galeri, çizim araçları (kova desenleri ve ipek stilleriyle), fırça boyutu menüsü, kova ve çıkartma, simetri, geri al, yinele, temizle ve aktarma. */
 @Composable
 fun ToolPanel(
     selectedTool: ToolType,
@@ -50,6 +51,7 @@ fun ToolPanel(
     actions: ToolPanelActions,
     symmetry: SymmetryControls,
     silk: SilkStyleControls,
+    fill: FillPatternControls,
     onToolSelected: (ToolType) -> Unit,
     onSizeSelected: (BrushSize) -> Unit,
     modifier: Modifier = Modifier,
@@ -62,10 +64,10 @@ fun ToolPanel(
         item { PanelDivider() }
         items(DrawingTools) { tool ->
             val selected = tool == selectedTool
-            if (tool == ToolType.SILK) {
-                SilkToolButton(selected, silk) { onToolSelected(tool) }
-            } else {
-                ToolButton(tool, selected) { onToolSelected(tool) }
+            when (tool) {
+                ToolType.SILK -> SilkToolButton(selected, silk) { onToolSelected(tool) }
+                ToolType.BUCKET -> BucketToolButton(selected, strokeColor.toArgb(), fill) { onToolSelected(tool) }
+                else -> ToolButton(tool, selected) { onToolSelected(tool) }
             }
         }
         item { PanelDivider() }

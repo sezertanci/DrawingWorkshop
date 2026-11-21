@@ -14,7 +14,7 @@ class ScanlineFloodFillerTest {
         // 7x7 tuval; 1..5 arasında siyah çerçeveli kare, içi 2..4.
         val pixels = canvas { x, y -> if (x in 1..5 && y in 1..5 && (x == 1 || x == 5 || y == 1 || y == 5)) BLACK else WHITE }
 
-        val bounds = filler.fill(pixels, SIZE, SIZE, 3, 3, RED)
+        val bounds = filler.fill(pixels, SIZE, SIZE, 3, 3, SOLID_RED)
 
         assertEquals(PixelRect(2, 2, 5, 5), bounds)
         assertEquals(RED, pixels[3 * SIZE + 3])
@@ -26,15 +26,15 @@ class ScanlineFloodFillerTest {
     fun fill_StartOutsideCanvas_ReturnsNull() {
         val pixels = canvas { _, _ -> WHITE }
 
-        assertNull(filler.fill(pixels, SIZE, SIZE, SIZE, 0, RED))
-        assertNull(filler.fill(pixels, SIZE, SIZE, -1, 0, RED))
+        assertNull(filler.fill(pixels, SIZE, SIZE, SIZE, 0, SOLID_RED))
+        assertNull(filler.fill(pixels, SIZE, SIZE, -1, 0, SOLID_RED))
     }
 
     @Test
     fun fill_SameColor_ReturnsNullAndKeepsPixels() {
         val pixels = canvas { _, _ -> RED }
 
-        val bounds = filler.fill(pixels, SIZE, SIZE, 0, 0, RED)
+        val bounds = filler.fill(pixels, SIZE, SIZE, 0, 0, SOLID_RED)
 
         assertNull(bounds)
         assertTrue(pixels.all { it == RED })
@@ -44,7 +44,7 @@ class ScanlineFloodFillerTest {
     fun fill_TransparentCanvas_FillsEverything() {
         val pixels = canvas { _, _ -> TRANSPARENT }
 
-        val bounds = filler.fill(pixels, SIZE, SIZE, 0, 0, RED)
+        val bounds = filler.fill(pixels, SIZE, SIZE, 0, 0, SOLID_RED)
 
         assertEquals(PixelRect(0, 0, SIZE, SIZE), bounds)
         assertTrue(pixels.all { it == RED })
@@ -55,7 +55,7 @@ class ScanlineFloodFillerTest {
         // Sol yarı saydam, orta sütun yarı saydam siyah kenar, sağ opak siyah.
         val pixels = canvas { x, _ -> if (x < 3) TRANSPARENT else if (x == 3) HALF_BLACK else BLACK }
 
-        filler.fill(pixels, SIZE, SIZE, 0, 0, RED)
+        filler.fill(pixels, SIZE, SIZE, 0, 0, SOLID_RED)
 
         val edge = pixels[3]
         assertEquals(ColorMath.MAX_CHANNEL, ColorMath.alpha(edge))
@@ -68,7 +68,7 @@ class ScanlineFloodFillerTest {
         val pixels = canvas { _, _ -> TRANSPARENT }
         val walls = BooleanArray(SIZE * SIZE) { it % SIZE == WALL_X }
 
-        val bounds = filler.fill(pixels, SIZE, SIZE, 0, 0, RED, walls)
+        val bounds = filler.fill(pixels, SIZE, SIZE, 0, 0, SOLID_RED, walls)
 
         assertEquals(PixelRect(0, 0, WALL_X, SIZE), bounds)
         assertEquals(RED, pixels[WALL_X - 1])
@@ -81,7 +81,7 @@ class ScanlineFloodFillerTest {
         val pixels = canvas { _, _ -> TRANSPARENT }
         val walls = BooleanArray(SIZE * SIZE) { it % SIZE == WALL_X }
 
-        assertNull(filler.fill(pixels, SIZE, SIZE, WALL_X, 0, RED, walls))
+        assertNull(filler.fill(pixels, SIZE, SIZE, WALL_X, 0, SOLID_RED, walls))
         assertTrue(pixels.all { it == TRANSPARENT })
     }
 
@@ -89,7 +89,7 @@ class ScanlineFloodFillerTest {
     fun fill_StartInsideBoundary_StopsAtBoundaryEdge() {
         val pixels = canvas { _, _ -> WHITE }
 
-        val bounds = filler.fill(pixels, SIZE, SIZE, 3, 3, RED, boundary = ART)
+        val bounds = filler.fill(pixels, SIZE, SIZE, 3, 3, SOLID_RED, boundary = ART)
 
         assertEquals(ART, bounds)
         assertEquals(RED, pixels[3 * SIZE + 3])
@@ -101,7 +101,7 @@ class ScanlineFloodFillerTest {
     fun fill_StartOutsideBoundary_FillsOnlyOutside() {
         val pixels = canvas { _, _ -> WHITE }
 
-        filler.fill(pixels, SIZE, SIZE, 0, 0, RED, boundary = ART)
+        filler.fill(pixels, SIZE, SIZE, 0, 0, SOLID_RED, boundary = ART)
 
         assertEquals(RED, pixels[3 * SIZE + 1])
         assertEquals(RED, pixels[SIZE * SIZE - 1])
@@ -113,20 +113,58 @@ class ScanlineFloodFillerTest {
         // Çizim alanının hemen dışındaki sütun yarı saydam; içeriden başlayan dolgu ona dokunmaz.
         val pixels = canvas { x, _ -> if (x == ART.left - 1) HALF_BLACK else WHITE }
 
-        filler.fill(pixels, SIZE, SIZE, 3, 3, RED, boundary = ART)
+        filler.fill(pixels, SIZE, SIZE, 3, 3, SOLID_RED, boundary = ART)
 
         assertEquals(HALF_BLACK, pixels[3 * SIZE + ART.left - 1])
     }
 
     @Test
-    fun sourceOver_OpaqueSource_ReturnsSource() {
-        assertEquals(BLACK, ColorMath.sourceOver(BLACK, RED))
+    fun fill_Pattern_MarksEveryPaintedPixel() {
+        val pixels = canvas { _, _ -> WHITE }
+
+        filler.fill(pixels, SIZE, SIZE, 0, 0, checkers())
+
+        assertTrue(pixels.all(PatternMark::isMarked))
+        assertEquals(2, pixels.distinct().size)
+    }
+
+    @Test
+    fun fill_StartOnPattern_RepaintsBothPatternColors() {
+        val pixels = canvas { _, _ -> WHITE }
+        filler.fill(pixels, SIZE, SIZE, 0, 0, checkers())
+
+        filler.fill(pixels, SIZE, SIZE, 3, 3, FillPaint.Solid(BLUE))
+
+        assertTrue(pixels.all { it == BLUE })
+    }
+
+    @Test
+    fun fill_StartOnPlainColorNextToPattern_KeepsPattern() {
+        // Sol yarı desenli, sağ yarı beyaz; sağdan başlayan dolgu deseni beyaz piksellerle karıştırmaz.
+        val pixels = canvas { _, _ -> WHITE }
+        val walls = BooleanArray(SIZE * SIZE) { it % SIZE == WALL_X }
+        filler.fill(pixels, SIZE, SIZE, 0, 0, checkers(), walls)
+
+        filler.fill(pixels, SIZE, SIZE, SIZE - 1, 0, FillPaint.Solid(BLUE))
+
+        assertTrue(PatternMark.isMarked(pixels[0]))
+        assertEquals(BLUE, pixels[SIZE - 1])
+    }
+
+    @Test
+    fun fill_SamePatternAgain_RepaintsInsteadOfSkipping() {
+        val pixels = canvas { _, _ -> WHITE }
+        filler.fill(pixels, SIZE, SIZE, 0, 0, checkers())
+
+        assertEquals(PixelRect(0, 0, SIZE, SIZE), filler.fill(pixels, SIZE, SIZE, 0, 0, checkers()))
     }
 
     @Test
     fun isClose_WithinTolerance_ReturnsTrue() {
         assertTrue(ColorMath.isClose(0xFFFFFFFF.toInt(), 0xFFF0F0F0.toInt(), TOLERANCE))
     }
+
+    private fun checkers() = FillPaint.Patterned(FillPattern.CHECKERS, RED, WHITE, TILE)
 
     private fun canvas(color: (Int, Int) -> Int) = IntArray(SIZE * SIZE) { color(it % SIZE, it / SIZE) }
 
@@ -137,6 +175,9 @@ class ScanlineFloodFillerTest {
         const val WHITE = 0xFFFFFFFF.toInt()
         const val BLACK = 0xFF000000.toInt()
         const val RED = 0xFFFF0000.toInt()
+        const val BLUE = 0xFF0000FF.toInt()
+        const val TILE = 2f
+        val SOLID_RED = FillPaint.Solid(RED)
         const val TRANSPARENT = 0
         const val HALF_BLACK = 0x80000000.toInt()
         val ART = PixelRect(2, 2, 5, 5)

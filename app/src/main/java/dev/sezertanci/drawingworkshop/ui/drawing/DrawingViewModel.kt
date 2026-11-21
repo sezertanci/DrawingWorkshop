@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.sezertanci.drawingworkshop.data.DrawingRepository
 import dev.sezertanci.drawingworkshop.data.coloring.ColoringPageCatalog
 import dev.sezertanci.drawingworkshop.data.export.DrawingExporter
+import dev.sezertanci.drawingworkshop.domain.fill.FillPattern
 import dev.sezertanci.drawingworkshop.domain.model.BrushSize
 import dev.sezertanci.drawingworkshop.domain.model.SilkStyle
 import dev.sezertanci.drawingworkshop.domain.model.StrokeSettings
@@ -16,6 +17,7 @@ import dev.sezertanci.drawingworkshop.domain.sound.SoundEffect
 import dev.sezertanci.drawingworkshop.domain.sound.SoundPlayer
 import dev.sezertanci.drawingworkshop.domain.symmetry.SymmetryMode
 import dev.sezertanci.drawingworkshop.ui.drawing.engine.DrawingEngine
+import dev.sezertanci.drawingworkshop.ui.drawing.engine.FillPaintFactory
 import dev.sezertanci.drawingworkshop.ui.drawing.engine.LineArtFactory
 import dev.sezertanci.drawingworkshop.ui.navigation.Routes
 import kotlinx.coroutines.CompletableDeferred
@@ -49,6 +51,7 @@ class DrawingViewModel @Inject constructor(
     private val exporter: DrawingExporter,
     private val pageCatalog: ColoringPageCatalog,
     private val lineArtFactory: LineArtFactory,
+    private val fillPaints: FillPaintFactory,
     private val sounds: SoundPlayer,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), DrawingTouchListener {
@@ -69,8 +72,14 @@ class DrawingViewModel @Inject constructor(
      */
     private val pendingFill = PointF()
 
+    /** Kova dokunuşu başladığındaki büyütme oranı; desen karoları ekranda hep aynı büyüklükte görünür. */
+    private var fillZoom = 1f
+
     /** Dokunuş başladığında seçili olan araç; dokunuş bitene kadar olaylar bu araca gider. */
     private var touchTool: ToolType? = null
+
+    /** Dokunuş damlalık modunda başladı mı; parmak kalkınca altındaki renk alınır. */
+    private var eyedropping = false
 
     val uiState: StateFlow<DrawingUiState> = combine(selection, engine.historyState) { state, history ->
         state.copy(canUndo = history.canUndo, canRedo = history.canRedo)
@@ -84,7 +93,7 @@ class DrawingViewModel @Inject constructor(
     /** Çıkartma aracından çıkılırken düzenlenen çıkartma resme işlenir. */
     fun selectTool(tool: ToolType) {
         if (tool != ToolType.STICKER) commitSticker()
-        updateSelection { it.copy(tool = tool) }
+        updateSelection { it.copy(tool = tool, colorPicker = ColorPickerMode.CLOSED) }
     }
 
     /** Düzenlenen bir çıkartma varsa onun resmi de değişir. */
@@ -97,6 +106,8 @@ class DrawingViewModel @Inject constructor(
 
     fun selectSilkStyle(style: SilkStyle) = updateSelection { it.copy(silkStyle = style) }
 
+    fun selectFillPattern(pattern: FillPattern) = updateSelection { it.copy(fillPattern = pattern) }
+
     /** Simetri kaydedilmez; her resim simetri kapalı açılır. */
     fun selectSymmetry(mode: SymmetryMode) = updateSelection { it.copy(symmetry = mode) }
 
@@ -104,12 +115,18 @@ class DrawingViewModel @Inject constructor(
 
     fun selectColorTarget(target: ColorTarget) = updateSelection { it.copy(colorTarget = target) }
 
+    /** Damlalık beklerken sağdaki paletten renk seçilirse damlalık bırakılır. */
     fun selectColor(color: Int) = updateSelection {
-        when (it.colorTarget) {
-            ColorTarget.STROKE -> it.copy(strokeColor = color, rainbow = false)
-            ColorTarget.BACKGROUND -> it.copy(backgroundColor = color)
-        }
+        val picker = if (it.colorPicker == ColorPickerMode.EYEDROPPER) ColorPickerMode.CLOSED else it.colorPicker
+        it.withColor(color).copy(colorPicker = picker)
     }
+
+    fun openColorPicker() = setColorPicker(ColorPickerMode.PANEL)
+
+    fun closeColorPicker() = setColorPicker(ColorPickerMode.CLOSED)
+
+    /** Panel kapanır; tuvale yapılan ilk dokunuşta parmağın altındaki renk alınır. */
+    fun startEyedropper() = setColorPicker(ColorPickerMode.EYEDROPPER)
 
     fun selectRainbow() = updateSelection { if (it.isRainbowAvailable) it.copy(rainbow = true) else it }
 
@@ -144,15 +161,23 @@ class DrawingViewModel @Inject constructor(
     override fun onTouchStart(x: Float, y: Float, zoom: Float) {
         val state = selection.value
         if (!state.isLoaded) return
+        if (state.colorPicker == ColorPickerMode.EYEDROPPER) {
+            eyedropping = true
+            return engine.showProbe(x, y)
+        }
         touchTool = state.tool
         when (state.tool) {
-            ToolType.BUCKET -> pendingFill.set(x, y)
+            ToolType.BUCKET -> {
+                pendingFill.set(x, y)
+                fillZoom = zoom
+            }
             ToolType.STICKER -> if (engine.startStickerTouch(state.sticker, x, y, zoom)) sounds.play(SoundEffect.STICKER)
             else -> engine.startStroke(x, y, zoom)
         }
     }
 
     override fun onTouchMove(x: Float, y: Float) {
+        if (eyedropping) return engine.showProbe(x, y)
         when (touchTool) {
             null -> Unit
             ToolType.BUCKET -> pendingFill.set(x, y)
@@ -164,14 +189,16 @@ class DrawingViewModel @Inject constructor(
     override fun onTouchBatchEnd() = engine.invalidate()
 
     override fun onTouchEnd() {
+        if (eyedropping) return finishEyedropper()
         val tool = touchTool ?: return
         touchTool = null
         when (tool) {
             ToolType.BUCKET -> {
                 val state = selection.value
                 val (x, y) = pendingFill.x to pendingFill.y
+                val paint = fillPaints.create(state.fillPattern, state.strokeColor, fillZoom)
                 viewModelScope.launch {
-                    if (engine.fill(x, y, state.strokeColor, state.symmetricFill)) sounds.play(SoundEffect.FILL)
+                    if (engine.fill(x, y, paint, state.symmetricFill)) sounds.play(SoundEffect.FILL)
                 }
             }
             ToolType.STICKER -> engine.endStickerTouch()
@@ -182,6 +209,8 @@ class DrawingViewModel @Inject constructor(
     /** İkinci parmak konunca çağrılır: çizgi iptal edilir, kova doldurmaz, çıkartma yerinde kalır. */
     override fun onTouchCancel() {
         touchTool = null
+        eyedropping = false
+        engine.takeProbe()
         engine.cancelStroke()
         engine.endStickerTouch()
     }
@@ -220,6 +249,15 @@ class DrawingViewModel @Inject constructor(
         }
         ready.await()
     }
+
+    /** Alınan renk uygulanır ve geniş panel yeniden açılır; tuvalin dışında kalındıysa renk değişmez. */
+    private fun finishEyedropper() {
+        eyedropping = false
+        val color = engine.takeProbe()
+        updateSelection { state -> (color?.let(state::withColor) ?: state).copy(colorPicker = ColorPickerMode.PANEL) }
+    }
+
+    private fun setColorPicker(mode: ColorPickerMode) = selection.update { it.copy(colorPicker = mode) }
 
     private fun commitSticker() {
         if (engine.commitSticker()) sounds.play(SoundEffect.STICKER)

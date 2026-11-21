@@ -7,9 +7,12 @@ sağda renk paneli, ortada tuval bulunur. Tuval dolu olsa bile akıcı çalışm
 
 ### Çizim (1. aşama)
 
-- Kurşun kalem, fırça, keçeli kalem, kaligrafi kalemi (yassı eğik uç; yöne göre kalınlaşıp incelir), pastel boya, sprey, silgi ve boya kovası
+- Kurşun kalem, fırça, keçeli kalem, kaligrafi kalemi (yassı eğik uç; yöne göre kalınlaşıp incelir), pastel boya, sprey, sim tozu (seçili renkte ya da gökkuşağı renginde çizgi üzerinde parıltı taneleri ve küçük yıldızlar), silgi ve boya kovası
+- Boya kovası düğmesine dokununca desen menüsü açılır: düz boya ya da seçili renk ile beyazdan oluşan dalgalı çizgiler, çapraz çizgiler, bulutlar, çizgili, puantiyeli, kareli, yıldızlar ve kalpler. Desenli bir alana yeniden dokunulunca kova desenin iki rengini birlikte tanır ve alanın tamamını yeni renge ya da desene boyar
 - Altı fırça boyutu (çok inceden çok kalına); seçili boyut panelde görünür, diğerleri açılır menüden seçilir
 - 24 renklik palet; seçilen renk kaleme veya tuvalin arka planına uygulanabilir
+- Paletin başındaki 🎨 düğmesi sağdan kayan geniş renk panelini açar: tonlu renk ızgarası, renk tekerleği ve açıklık çubuğu. Panel seçim yapınca açık kalır, dışına dokununca kapanır; paletin dışından seçilen renk düğmenin içinde görünür
+- Geniş paneldeki damlalık düğmesi tuvalden renk alır: düğmeye basınca panel kapanır, tuvale dokunup parmak gezdirilirken parmağın üstündeki büyüteç altındaki rengi gösterir. Parmak kalkınca o renk seçilir ve panel yeniden açılır
 - 5 adımlık geri al ve yinele
 - Çizim tuvalin dışına taşmaz; ekran dönse bile çizim kaybolmaz
 

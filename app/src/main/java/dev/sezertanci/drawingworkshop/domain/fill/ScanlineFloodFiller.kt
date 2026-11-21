@@ -1,6 +1,7 @@
 package dev.sezertanci.drawingworkshop.domain.fill
 
 import dev.sezertanci.drawingworkshop.domain.geometry.PixelRect
+import dev.sezertanci.drawingworkshop.domain.model.Argb
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -8,7 +9,8 @@ import kotlin.math.abs
  * Satır taramalı (scanline) boya kovası.
  *
  * Özyineleme kullanmaz; büyük alanlarda bile yığın taşması olmaz. Başlangıç rengine [TOLERANCE]
- * kadar yakın pikseller doldurulur. Ardından kenardaki yarı saydam (kenar yumuşatmalı) pikseller
+ * kadar yakın pikseller doldurulur; desenli alanlar bu sırada dışarıda kalır. Dokunulan piksel desen
+ * imzası ([PatternMark]) taşıyorsa, desenin iki rengini birden kapsayan imzalı alanın tamamı doldurulur. Ardından kenardaki yarı saydam (kenar yumuşatmalı) pikseller
  * yeni rengin üzerine karıştırılır; böylece çizgi ile dolgu arasında beyaz hale kalmaz.
  */
 class ScanlineFloodFiller @Inject constructor() : FloodFiller {
@@ -19,18 +21,18 @@ class ScanlineFloodFiller @Inject constructor() : FloodFiller {
         height: Int,
         startX: Int,
         startY: Int,
-        color: Int,
+        paint: FillPaint,
         walls: BooleanArray?,
         boundary: PixelRect?,
     ): PixelRect? {
         if (startX !in 0 until width || startY !in 0 until height) return null
         val target = pixels[startY * width + startX]
-        if (target == color) return null
+        if (paint.alreadyCovers(target)) return null
 
         val side = boundary?.let { BoundarySide(it, width, it.contains(startX, startY)) }
-        val region = FillRegion(pixels, width, height, target, walls, side)
-        region.floodFrom(startX, startY, color)
-        repeat(EDGE_BLEND_PASSES) { region.blendEdges(color) }
+        val region = FillRegion(pixels, width, height, Matcher(target), walls, side, paint)
+        region.floodFrom(startX, startY)
+        repeat(EDGE_BLEND_PASSES) { region.blendEdges() }
         return region.bounds()
     }
 
@@ -38,9 +40,10 @@ class ScanlineFloodFiller @Inject constructor() : FloodFiller {
         private val pixels: IntArray,
         private val width: Int,
         private val height: Int,
-        private val target: Int,
+        private val matcher: Matcher,
         private val walls: BooleanArray?,
         private val side: BoundarySide?,
+        private val paint: FillPaint,
     ) {
         private val filled = BooleanArray(pixels.size)
         private val stack = IntStack()
@@ -49,21 +52,21 @@ class ScanlineFloodFiller @Inject constructor() : FloodFiller {
         private var maxX = -1
         private var maxY = -1
 
-        fun floodFrom(x: Int, y: Int, color: Int) {
+        fun floodFrom(x: Int, y: Int) {
             stack.push(y * width + x)
             while (stack.isNotEmpty()) {
                 val index = stack.pop()
-                if (canFill(index)) fillSpan(index % width, index / width, color)
+                if (canFill(index)) fillSpan(index % width, index / width)
             }
         }
 
-        private fun fillSpan(x: Int, y: Int, color: Int) {
+        private fun fillSpan(x: Int, y: Int) {
             val row = y * width
             var left = x
             while (left > 0 && canFill(row + left - 1)) left--
             var right = x
             while (right < width - 1 && canFill(row + right + 1)) right++
-            for (i in left..right) paint(row + i, color)
+            for (i in left..right) paintPixel(row + i)
             include(left, y)
             include(right, y)
             if (y > 0) pushSpanSeeds(left, right, y - 1)
@@ -81,7 +84,7 @@ class ScanlineFloodFiller @Inject constructor() : FloodFiller {
             }
         }
 
-        fun blendEdges(color: Int) {
+        fun blendEdges() {
             if (maxX < 0) return
             val edges = IntStack()
             val x0 = (minX - 1).coerceAtLeast(0)
@@ -96,7 +99,7 @@ class ScanlineFloodFiller @Inject constructor() : FloodFiller {
             }
             while (edges.isNotEmpty()) {
                 val index = edges.pop()
-                pixels[index] = ColorMath.sourceOver(pixels[index], color)
+                pixels[index] = Argb.sourceOver(pixels[index], paint.colorAt(index % width, index / width))
                 filled[index] = true
                 include(index % width, index / width)
             }
@@ -113,12 +116,12 @@ class ScanlineFloodFiller @Inject constructor() : FloodFiller {
         }
 
         private fun canFill(index: Int): Boolean =
-            !filled[index] && (walls == null || !walls[index]) && isOnSide(index) && ColorMath.isClose(pixels[index], target, TOLERANCE)
+            !filled[index] && (walls == null || !walls[index]) && isOnSide(index) && matcher.matches(pixels[index])
 
         private fun isOnSide(index: Int): Boolean = side == null || side.matches(index)
 
-        private fun paint(index: Int, color: Int) {
-            pixels[index] = color
+        private fun paintPixel(index: Int) {
+            pixels[index] = paint.colorAt(index % width, index / width)
             filled[index] = true
         }
 
@@ -130,6 +133,18 @@ class ScanlineFloodFiller @Inject constructor() : FloodFiller {
         }
 
         private fun isTranslucent(pixel: Int): Boolean = ColorMath.alpha(pixel) in 1 until ColorMath.MAX_CHANNEL
+    }
+
+    /** Başlangıç pikseline göre hangi piksellerin aynı alana ait sayılacağı. */
+    private class Matcher(private val target: Int) {
+        private val patterned = PatternMark.isMarked(target)
+
+        fun matches(pixel: Int): Boolean =
+            if (patterned) {
+                PatternMark.isMarked(pixel)
+            } else {
+                !PatternMark.isMarked(pixel) && ColorMath.isClose(pixel, target, TOLERANCE)
+            }
     }
 
     /** Dolgunun [boundary] kenarının hangi tarafında ([inside]) kalacağını belirler. */
@@ -160,31 +175,15 @@ class ScanlineFloodFiller @Inject constructor() : FloodFiller {
 
 /** ARGB tam sayıları üzerinde renk hesapları. */
 internal object ColorMath {
-    const val MAX_CHANNEL = 255
+    const val MAX_CHANNEL = Argb.CHANNEL_MAX
 
-    fun alpha(color: Int): Int = (color ushr 24) and MAX_CHANNEL
+    fun alpha(color: Int): Int = channel(color, ALPHA_SHIFT)
 
-    private fun channel(color: Int, shift: Int): Int = (color shr shift) and MAX_CHANNEL
+    private fun channel(color: Int, shift: Int): Int = Argb.channel(color, shift)
 
     fun isClose(a: Int, b: Int, tolerance: Int): Boolean =
         CHANNEL_SHIFTS.all { abs(channel(a, it) - channel(b, it)) <= tolerance }
 
-    /** [source] rengini [destination] renginin üzerine koyar (premültiplike olmayan ARGB). */
-    fun sourceOver(source: Int, destination: Int): Int {
-        val sa = alpha(source)
-        val da = alpha(destination)
-        val outAlpha = sa + da * (MAX_CHANNEL - sa) / MAX_CHANNEL
-        if (outAlpha == 0) return 0
-        var result = outAlpha shl ALPHA_SHIFT
-        for (shift in COLOR_SHIFTS) {
-            val blended = (channel(source, shift) * sa +
-                channel(destination, shift) * da * (MAX_CHANNEL - sa) / MAX_CHANNEL) / outAlpha
-            result = result or (blended shl shift)
-        }
-        return result
-    }
-
-    private const val ALPHA_SHIFT = 24
-    private val COLOR_SHIFTS = intArrayOf(16, 8, 0)
-    private val CHANNEL_SHIFTS = intArrayOf(ALPHA_SHIFT, 16, 8, 0)
+    private const val ALPHA_SHIFT = Argb.ALPHA_SHIFT
+    private val CHANNEL_SHIFTS = intArrayOf(ALPHA_SHIFT, Argb.RED_SHIFT, Argb.GREEN_SHIFT, Argb.BLUE_SHIFT)
 }

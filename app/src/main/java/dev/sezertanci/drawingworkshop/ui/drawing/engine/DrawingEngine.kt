@@ -7,9 +7,12 @@ import android.graphics.Rect
 import android.util.Size
 import dagger.hilt.android.scopes.ViewModelScoped
 import dev.sezertanci.drawingworkshop.di.DefaultDispatcher
+import dev.sezertanci.drawingworkshop.domain.fill.FillPaint
 import dev.sezertanci.drawingworkshop.domain.fill.FloodFiller
+import dev.sezertanci.drawingworkshop.domain.fill.PatternMark
 import dev.sezertanci.drawingworkshop.domain.geometry.mergeOverlapping
 import dev.sezertanci.drawingworkshop.domain.history.UndoRedoHistory
+import dev.sezertanci.drawingworkshop.domain.model.Argb
 import dev.sezertanci.drawingworkshop.domain.model.BrushSize
 import dev.sezertanci.drawingworkshop.domain.model.Palette
 import dev.sezertanci.drawingworkshop.domain.model.StrokeSettings
@@ -44,6 +47,7 @@ class DrawingEngine @Inject constructor(
     private val strokeFactory: StrokeFactory,
     private val stickerRenderer: StickerRenderer,
     private val symmetryGuides: SymmetryGuides,
+    private val eyedropperLoupe: EyedropperLoupe,
     private val floodFiller: FloodFiller,
     @param:DefaultDispatcher private val fillDispatcher: CoroutineDispatcher,
 ) {
@@ -58,6 +62,7 @@ class DrawingEngine @Inject constructor(
     private var symmetryPainter = SymmetryPainter(SymmetryMode.OFF, 0, 0)
     private var strokeSymmetry = symmetryPainter
     private var lineArt: LineArt? = null
+    private var probe: ColorProbe? = null
     private var isFilling = false
     private var onChanged: (() -> Unit)? = null
     private val isStroking: Boolean get() = activeStroke != null || liveStroke?.isReleased == false
@@ -145,6 +150,32 @@ class DrawingEngine @Inject constructor(
         currentLineArt()?.let { canvas.drawBitmap(it.bitmap, 0f, 0f, null) }
         symmetryGuides.draw(canvas, symmetry, surface.width, surface.height, zoom)
         sticker?.let { stickerRenderer.drawControls(canvas, it, zoom) }
+        probe?.let { eyedropperLoupe.draw(canvas, it, zoom) }
+    }
+
+    /** Damlalık büyütecini noktaya taşır; nokta tuvalin dışındaysa büyüteç gizlenir. */
+    fun showProbe(x: Float, y: Float) {
+        probe = colorAt(x.toInt(), y.toInt())?.let { ColorProbe(x, y, it) }
+        notifyChanged()
+    }
+
+    /** Büyüteci kaldırır ve gösterdiği rengi döndürür; büyüteç yoksa `null`. */
+    fun takeProbe(): Int? {
+        val color = probe?.color
+        probe = null
+        notifyChanged()
+        return color
+    }
+
+    /**
+     * Ekranda görünen renk: arka plan, üstünde boya katmanı (desen imzası silinmiş) ve en üstte
+     * boyama sayfasının çizgileri. Nokta tuvalin dışındaysa `null` döner.
+     */
+    private fun colorAt(x: Int, y: Int): Int? {
+        val paint = surface.pixelAt(x, y) ?: return null
+        val painted = Argb.sourceOver(PatternMark.clear(paint), backgroundColor)
+        val art = currentLineArt() ?: return painted
+        return Argb.sourceOver(art.bitmap.getPixel(x, y), painted)
     }
 
     /** [zoom] büyüdükçe çizgi resim üzerinde incelir; böylece ekranda aynı kalınlıkta görünür. */
@@ -247,10 +278,10 @@ class DrawingEngine @Inject constructor(
     }
 
     /**
-     * Bir bölge boyandıysa `true` döner; dokunulan yer zaten o renkse veya boyama yarıda kaldıysa `false`.
+     * Bir bölge [paint] boyasıyla (düz renk veya desen) boyandıysa `true` döner; dokunulan yer zaten o renkse veya boyama yarıda kaldıysa `false`.
      * [symmetric] ise simetrinin her kopya noktası da sırayla doldurulur ve tek adımda geri alınır.
      */
-    suspend fun fill(x: Float, y: Float, color: Int, symmetric: Boolean): Boolean {
+    suspend fun fill(x: Float, y: Float, paint: FillPaint, symmetric: Boolean): Boolean {
         if (isFilling) return false
         settleFadingStroke()
         val width = surface.width
@@ -262,7 +293,7 @@ class DrawingEngine @Inject constructor(
             val art = currentLineArt()
             val filled = withContext(fillDispatcher) {
                 seeds.mapNotNull {
-                    floodFiller.fill(pixels, width, height, it.x, it.y, color, art?.walls, art?.artBounds)
+                    floodFiller.fill(pixels, width, height, it.x, it.y, paint, art?.walls, art?.artBounds)
                 }.mergeOverlapping()
             }
             if (filled.isEmpty() || surface.width != width || surface.height != height) return false

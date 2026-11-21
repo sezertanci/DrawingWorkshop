@@ -1,5 +1,6 @@
 package dev.sezertanci.drawingworkshop.domain.stroke
 
+import dev.sezertanci.drawingworkshop.domain.model.Argb
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -36,10 +37,6 @@ class RainbowHues(private val legLength: Float, private val random: Random = Ran
         const val FULL_TURN_DEGREES = 360f
         const val MIN_TURN_DEGREES = 60f
         const val MAX_TURN_DEGREES = 135f
-        private const val CHANNEL_MAX = 255
-        private const val OPAQUE_ALPHA = 0xFF shl 24
-        private const val RED_SHIFT = 16
-        private const val GREEN_SHIFT = 8
 
         /** Her renk, kendi payının bu oranında saf kalır; geri kalanında bir sonraki renge geçer. */
         const val COLOR_HOLD_SHARE = 0.6f
@@ -61,10 +58,11 @@ class RainbowHues(private val legLength: Float, private val random: Random = Ran
             val from = PALETTE[index]
             val to = PALETTE[(index + 1) % PALETTE.size]
             val t = blendAt(position - position.toInt())
-            return OPAQUE_ALPHA or
-                (mix(from, to, RED_SHIFT, t) shl RED_SHIFT) or
-                (mix(from, to, GREEN_SHIFT, t) shl GREEN_SHIFT) or
-                mix(from, to, 0, t)
+            return Argb.opaque(
+                mix(from, to, Argb.RED_SHIFT, t),
+                mix(from, to, Argb.GREEN_SHIFT, t),
+                mix(from, to, Argb.BLUE_SHIFT, t),
+            )
         }
 
         /** Rengin payı içindeki [share] konumunda, bir sonraki renge ne kadar geçildiği (0 ile 1 arası). */
@@ -75,8 +73,8 @@ class RainbowHues(private val legLength: Float, private val random: Random = Ran
         private fun smoothStep(t: Float): Float = t * t * (3f - 2f * t)
 
         private fun mix(from: Int, to: Int, shift: Int, t: Float): Int {
-            val a = (from shr shift) and CHANNEL_MAX
-            val b = (to shr shift) and CHANNEL_MAX
+            val a = Argb.channel(from, shift)
+            val b = Argb.channel(to, shift)
             return (a + (b - a) * t).roundToInt()
         }
     }

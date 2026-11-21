@@ -22,6 +22,16 @@
     <string name="tool_calligraphy">Kaligrafi kalemi</string>
     <string name="tool_crayon">Pastel boya</string>
     <string name="tool_spray">Sprey</string>
+    <string name="tool_glitter">Sim tozu</string>
+    <string name="fill_solid">Düz boya</string>
+    <string name="fill_waves">Dalgalı çizgiler</string>
+    <string name="fill_crosshatch">Çapraz çizgiler</string>
+    <string name="fill_clouds">Bulutlar</string>
+    <string name="fill_stripes">Çizgili</string>
+    <string name="fill_dots">Puantiyeli</string>
+    <string name="fill_checkers">Kareli</string>
+    <string name="fill_stars">Yıldızlar</string>
+    <string name="fill_hearts">Kalpler</string>
     <string name="tool_eraser">Silgi</string>
     <string name="tool_bucket">Boya kovası</string>
     <string name="tool_sticker">Çıkartma</string>
@@ -55,6 +65,10 @@
     <string name="color_target_background">Arka plan rengi</string>
     <string name="color_swatch">Renk</string>
     <string name="color_rainbow">Gökkuşağı</string>
+    <string name="color_more">Başka renkler</string>
+    <string name="color_wheel">Renk tekerleği</string>
+    <string name="color_lightness">Açıklık</string>
+    <string name="color_eyedropper">Renk damlalığı</string>
 
     <string name="action_home">Galeriye dön</string>
     <string name="action_export">Cihaz galerisine aktar</string>
