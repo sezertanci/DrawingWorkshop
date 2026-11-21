@@ -18,7 +18,7 @@ Resimler otomatik olarak kaydedilir ve her zaman galeride sizi bekler.
 
 Reklam, hesap ve uygulama içi satın alma yoktur. Kişisel veri toplanmaz, resimler yalnızca cihazda saklanır ve internet bağlantısı gerekmez.
 
-## Sürüm notu (1.6.0)
+## Sürüm notu (1.6.1)
 
 - Geniş renk paneli: renk çemberi ve tonlarla istenen her renk seçilebilir.
 - Desenli boya kovası: alanlar çizgili, puantiyeli ve benzeri desenlerle doldurulabilir.

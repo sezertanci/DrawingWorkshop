@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Yatay yön kilidi bu özelliği zorunlu sayar; yalnızca dikey ekranı olan cihazlar da dışlanmasın diye isteğe bağlıdır. -->
+    <uses-feature
+        android:name="android.hardware.screen.landscape"
+        android:required="false" />
+
     <application
         android:name=".DrawingWorkshopApp"
         android:allowBackup="false"
