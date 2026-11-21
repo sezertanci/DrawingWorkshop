@@ -18,6 +18,14 @@ Resimler otomatik olarak kaydedilir ve her zaman galeride sizi bekler.
 
 Reklam, hesap ve uygulama içi satın alma yoktur. Kişisel veri toplanmaz, resimler yalnızca cihazda saklanır ve internet bağlantısı gerekmez.
 
+## Sürüm notu (1.6.0)
+
+- Geniş renk paneli: renk çemberi ve tonlarla istenen her renk seçilebilir.
+- Desenli boya kovası: alanlar çizgili, puantiyeli ve benzeri desenlerle doldurulabilir.
+- Yeni sim tozu aracı; gökkuşağı renkleriyle de kullanılabilir.
+- Renk damlalığı: resimdeki bir renge dokunarak o renk seçilir.
+- Üç yeni mandala boyama sayfası: çiçek, güneş ve dalgalı mandala.
+
 ## Sürüm notu (1.5.0)
 
 - Yeni kaligrafi kalemi: yassı ucu sayesinde çizgi, yönüne göre kalınlaşıp incelir.

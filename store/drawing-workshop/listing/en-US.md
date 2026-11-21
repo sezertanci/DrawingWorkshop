@@ -18,6 +18,14 @@ Drawings are saved automatically and are always waiting in the gallery.
 
 No ads, no accounts and no in-app purchases. No personal data is collected, drawings stay on the device and no internet connection is needed.
 
+## Sürüm notu (1.6.0)
+
+- Large colour panel: pick any colour from the colour wheel and its shades.
+- Patterned paint bucket: fill areas with stripes, dots and other patterns.
+- New glitter tool, which also works with rainbow colours.
+- Colour picker: touch a colour in the drawing to select it.
+- Three new mandala colouring pages: a flower, a sun and a wavy mandala.
+
 ## Sürüm notu (1.5.0)
 
 - New calligraphy pen: its flat nib makes lines thicker or thinner depending on their direction.
