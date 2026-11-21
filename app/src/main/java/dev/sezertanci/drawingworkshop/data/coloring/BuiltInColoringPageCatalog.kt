@@ -37,6 +37,9 @@ class BuiltInColoringPageCatalog @Inject constructor() : ColoringPageCatalog {
         ColoringPage("robot", R.drawable.coloring_robot),
         ColoringPage("astronaut", R.drawable.coloring_astronaut),
         ColoringPage("dragon", R.drawable.coloring_dragon),
+        ColoringPage("mandala_flower", R.drawable.coloring_mandala_flower),
+        ColoringPage("mandala_sun", R.drawable.coloring_mandala_sun),
+        ColoringPage("mandala_wave", R.drawable.coloring_mandala_wave),
     )
 
     /** Yeniden eskiye sıralı; yeni eklenen sayfalar galeride ilk sırada görünür. */

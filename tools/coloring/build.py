@@ -39,6 +39,8 @@ LINE_COLOR = "@color/line_art"
 SAMPLE_STEP = 2.0
 SIMPLIFY_TOLERANCE = 0.15
 INDENT = "    "
+# Android kaynak derleyicisi 32 767 karakterden uzun metinleri keser; uzun yollar parçalara bölünür.
+MAX_PATH_DATA = 30000
 
 
 @dataclass
@@ -137,9 +139,23 @@ def polygon_data(geometry: BaseGeometry) -> list[str]:
     for polygon in polygons:
         if polygon.is_empty or not isinstance(polygon, Polygon):
             continue
-        for ring in [polygon.exterior, *polygon.interiors]:
-            result.append(points_data(list(ring.simplify(SIMPLIFY_TOLERANCE).coords)[:-1], True))
+        rings = [polygon.exterior, *polygon.interiors]
+        # Delikler dış halkayla aynı yolda kalır; yol parçalara bölünürken evenOdd bozulmaz.
+        result.append(" ".join(points_data(list(r.simplify(SIMPLIFY_TOLERANCE).coords)[:-1], True) for r in rings))
     return result
+
+
+def chunked(data: list[str]) -> list[str]:
+    """Alt yolları, her biri MAX_PATH_DATA karakteri aşmayan pathData metinlerinde toplar."""
+    chunks: list[list[str]] = [[]]
+    size = 0
+    for part in data:
+        if chunks[-1] and size + len(part) + 1 > MAX_PATH_DATA:
+            chunks.append([])
+            size = 0
+        chunks[-1].append(part)
+        size += len(part) + 1
+    return [" ".join(chunk) for chunk in chunks if chunk]
 
 
 def clip_targets(items: list[Item]) -> dict[int, BaseGeometry]:
@@ -178,17 +194,17 @@ def flatten(items: list[Item]) -> tuple[dict[float, list[str]], list[str]]:
 def vector_xml(name: str, strokes: dict[float, list[str]], fills: list[str]) -> str:
     paths = []
     for width, data in sorted(strokes.items()):
-        if data:
+        for chunk in chunked(data):
             paths.append(
-                f'{INDENT}<path\n{INDENT * 2}android:pathData="{" ".join(data)}"\n'
+                f'{INDENT}<path\n{INDENT * 2}android:pathData="{chunk}"\n'
                 f'{INDENT * 2}android:strokeWidth="{fmt(width)}"\n'
                 f'{INDENT * 2}android:strokeColor="{LINE_COLOR}"\n'
                 f'{INDENT * 2}android:strokeLineCap="round"\n'
                 f'{INDENT * 2}android:strokeLineJoin="round" />'
             )
-    if fills:
+    for chunk in chunked(fills):
         paths.append(
-            f'{INDENT}<path\n{INDENT * 2}android:pathData="{" ".join(fills)}"\n'
+            f'{INDENT}<path\n{INDENT * 2}android:pathData="{chunk}"\n'
             f'{INDENT * 2}android:fillColor="{LINE_COLOR}"\n'
             f'{INDENT * 2}android:fillType="evenOdd" />'
         )

@@ -184,6 +184,9 @@ Tarih: 2026-11-08 (3. aşama tamamlandı)
      damlalığı. Damlalık panelden açılır; tuvalde basılı tutarken parmağın üstünde büyüteç görünür,
      bırakınca renk seçilir ve panel yeniden açılır (`EyedropperLoupe`, `DrawingEngine.takeProbe`).
      Alfa karışımı ortak `Argb.sourceOver`. 158 birim testi geçiyor.
+   - **Mandalalar (commit edildi):** çiçek (`mandala_flower`, yanları yarım nilüferli), oval güneş
+     (`mandala_sun`) ve dalgalı/zikzaklı (`mandala_wave`) mandala; toplam 32 sayfa. `build.py` uzun
+     pathData'yı 30 000 karakterlik parçalara böler (AAPT2 32 767'de kesip "Unknown command for: R" çökmesine yol açıyordu).
    - **Sıradaki adım:** kullanıcı `keytool` ile yükleme anahtarını oluşturur ve şifreleri
      `~/.gradle/gradle.properties` dosyasına yazar; ardından imzalı `bundleRelease`. Sonra Play Console:
      ekran görüntüleri (emülatör), mağaza metinleri, Aileler politikası beyanları, 12 kişiyle 14 gün kapalı test.
